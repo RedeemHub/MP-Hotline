@@ -1,0 +1,204 @@
+﻿@page "/calls"
+
+@using System.Globalization
+@using BlazorApp1.Components.Data
+@rendermode InteractiveServer
+@inject BlazorApp1.Components.Data.ScheduleDBContext DbContext
+
+<h3>Schedule</h3>
+
+<div class="table-container">
+    <button @onclick="PreviousWeek">&lt; Previous Week</button>
+    <button @onclick="NextWeek">Next Week &gt;</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 150px;">Week @currentWeek </th>
+                <th style="width: 150px;">Monday <br /> @GetDateOfWeekInYear(DateTime.Today.Year, currentWeek, 1).ToString("dd/MM")</th>
+                <th style="width: 150px;">Tuesday <br /> @GetDateOfWeekInYear(DateTime.Today.Year, currentWeek, 2).ToString("dd/MM")</th>
+                <th style="width: 150px;">Wednesday <br /> @GetDateOfWeekInYear(DateTime.Today.Year, currentWeek, 3).ToString("dd/MM")</th>
+                <th style="width: 150px;">Thursday <br /> @GetDateOfWeekInYear(DateTime.Today.Year, currentWeek, 4).ToString("dd/MM")</th>
+                <th style="width: 150px;">Friday <br /> @GetDateOfWeekInYear(DateTime.Today.Year, currentWeek, 5).ToString("dd/MM")</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width: 150px;">
+                    7-11
+                </td>
+                @for (int day = 1; day <= 5; day++)
+                {
+                    <td style="width: 150px;">
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                        <br />
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                        <br />
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td style="width: 150px;">
+                    11-14
+                </td>
+                @for (int day = 1; day <= 5; day++)
+                {
+                    <td style="width: 150px;">
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                        <br />
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                        <br />
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td style="width: 150px;">
+                    14-18
+                </td>
+                @for (int day = 1; day <= 5; day++)
+                {
+                    <td style="width: 150px;">
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                        <br />
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                        <br />
+                        <select>
+                            <option value="">Select Option</option>
+                            <option value="Option1">Option 1</option>
+                            <option value="Option2">Option 2</option>
+                            <option value="Option3">Option 3</option>
+                        </select>
+                    </td>
+                }
+            </tr>
+        </tbody>
+    </table>
+    <button @onclick="AddEntry">Add Entry</button>
+    
+</div>
+
+@code {
+    private int currentWeek;
+
+
+    protected override void OnInitialized()
+    {
+        currentWeek = GetIso8601WeekOfYear(DateTime.Today);
+    }
+
+    private DateTime GetDateOfWeekInYear(int year, int weekNumber, int dayOfWeek)
+    {
+        DateTime jan1 = new DateTime(year, 1, 1);
+        int daysOffset = (int)jan1.DayOfWeek - 1;
+        DateTime firstMonday = jan1.AddDays(daysOffset);
+        int daysToAdd = (weekNumber - 1) * 7 + dayOfWeek - 1;
+        return firstMonday.AddDays(daysToAdd);
+    }
+
+    private int GetIso8601WeekOfYear(DateTime date)
+    {
+        DayOfWeek day = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(date);
+        if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
+        {
+            date = date.AddDays(3);
+        }
+
+        return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+    }
+
+    private void PreviousWeek()
+    {
+        currentWeek--;
+        Console.WriteLine("Previous Week Clicked, Current Week: " + currentWeek); // Output debug information
+        StateHasChanged(); // Trigger a re-render after updating the week
+    }
+
+    private void NextWeek()
+    {
+        currentWeek++;
+        Console.WriteLine("Next Week Clicked, Current Week: " + currentWeek); // Output debug information
+        StateHasChanged(); // Trigger a re-render after updating the week
+    }
+
+
+
+    private List<ScheduleEntry> userSelections = new List<ScheduleEntry>(); // List to hold user selections
+
+    private ScheduleEntry newEntry = new ScheduleEntry(); // New entry object to hold user selections
+
+    // Method to add a new entry to the user selections collection
+    private void AddEntry()
+    {
+        // Populate the newEntry with default values or user selections from the UI
+        // For demonstration, I'll assume default values, but you'll need to extract data from your UI controls
+        newEntry.Date = DateTime.Today; // Example: Set the date to today's date
+        newEntry.Option1 = "Option 1"; // Example: Set the first option to "Option 1"
+        newEntry.Option2 = "Option 2"; // Example: Set the second option to "Option 2"
+
+        // Add the new entry to the list (to later persist to the database)
+        userSelections.Add(newEntry);
+
+        // Reset the new entry object for a new entry
+        newEntry = new ScheduleEntry();
+    }
+
+    // Method to save user selections to the database
+    private async Task SaveToDatabase()
+    {
+        // Ensure userSelections has data to save
+        if (userSelections.Count > 0)
+        {
+            foreach (var entry in userSelections)
+            {
+                // Add the entry to the DbContext for saving
+                DbContext.ScheduleEntries.Add(entry);
+            }
+
+            // Save changes to the database
+            await DbContext.SaveChangesAsync();
+        }
+    }
+
+}
+

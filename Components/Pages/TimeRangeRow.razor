@@ -1,0 +1,45 @@
+﻿<tr>
+    <td style="width: 150px;">@TimeRange</td>
+    @for (int day = 1; day <= 5; day++)
+    {
+        <td style="width: 150px;">
+            @for (int opt = 0; opt < OptionBoxes; opt++)
+            {
+                <select @bind="selectedOptions[day, opt]">
+                    <option value="">Select Option</option>
+                    <option value="Option1">Option 1</option>
+                    <option value="Option2">Option 2</option>
+                    <option value="Option3">Option 3</option>
+                </select>
+                <br />
+            }
+        </td>
+    }
+    <td style="width: 50px;">
+        <input type="number" @bind="OptionBoxes" min="1" max="5" style="width: 30px;" @oninput="UpdateOptions" />
+    </td>
+</tr>
+
+@code {
+    [Parameter]
+    public string TimeRange { get; set; }
+
+    public int OptionBoxes { get; set; } = 1;
+    public string[,] selectedOptions { get; set; }
+
+    protected override void OnInitialized()
+    {
+        selectedOptions = new string[6, 5];
+    }
+
+    protected override void OnParametersSet()
+    {
+        selectedOptions = new string[6, OptionBoxes];
+    }
+
+    private void UpdateOptions(ChangeEventArgs e)
+    {
+        OptionBoxes = Convert.ToInt32(e.Value);
+        selectedOptions = new string[6, OptionBoxes];
+    }
+}
