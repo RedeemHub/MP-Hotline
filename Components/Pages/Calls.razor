@@ -1,9 +1,13 @@
 ﻿@page "/calls"
-
 @using System.Globalization
+@using System
 @using BlazorApp1.Components.Data
+@using Dapper
+@using Microsoft.Data.SqlClient
+
+
 @rendermode InteractiveServer
-@inject BlazorApp1.Components.Data.ScheduleDBContext DbContext
+
 
 <h3>Schedule</h3>
 
@@ -30,24 +34,24 @@
                 {
                     <td style="width: 150px;">
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                         <br />
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                         <br />
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                     </td>
                 }
@@ -60,24 +64,24 @@
                 {
                     <td style="width: 150px;">
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                         <br />
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                         <br />
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                     </td>
                 }
@@ -90,24 +94,24 @@
                 {
                     <td style="width: 150px;">
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                         <br />
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                         <br />
                         <select>
-                            <option value="">Select Option</option>
-                            <option value="Option1">Option 1</option>
-                            <option value="Option2">Option 2</option>
-                            <option value="Option3">Option 3</option>
+                            @foreach (var name in NamesList)
+                            {
+                                <option value="@name">@name</option>
+                            }
                         </select>
                     </td>
                 }
@@ -115,15 +119,31 @@
         </tbody>
     </table>
     <button @onclick="AddEntry">Add Entry</button>
-    
+    <button @onclick="AddEntryAsync">Add New Entry</button>
+    <div class="input-group mb-3">
+        <input @bind="NewEntryName" type="text" class="form-control" placeholder="Enter Name">
+        <button class="btn btn-primary" @onclick="AddEntryAsync">Add Entry</button>
+    </div>
+    <div>
+        <h4>People in Database</h4>
+        <ul>
+            @foreach (var name in NamesList)
+            {
+                <li>@name</li>
+            }
+        </ul>
+    </div>
+
 </div>
+
 
 @code {
     private int currentWeek;
 
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await LoadNames();
         currentWeek = GetIso8601WeekOfYear(DateTime.Today);
     }
 
@@ -163,42 +183,47 @@
 
 
 
-    private List<ScheduleEntry> userSelections = new List<ScheduleEntry>(); // List to hold user selections
-
-    private ScheduleEntry newEntry = new ScheduleEntry(); // New entry object to hold user selections
-
     // Method to add a new entry to the user selections collection
     private void AddEntry()
     {
-        // Populate the newEntry with default values or user selections from the UI
+    // Populate the newEntry with default values or user selections from the UI
         // For demonstration, I'll assume default values, but you'll need to extract data from your UI controls
-        newEntry.Date = DateTime.Today; // Example: Set the date to today's date
-        newEntry.Option1 = "Option 1"; // Example: Set the first option to "Option 1"
-        newEntry.Option2 = "Option 2"; // Example: Set the second option to "Option 2"
+         //newEntry.Date = DateTime.Today; // Example: Set the date to today's date
+        // newEntry.Option1 = "Option 1"; // Example: Set the first option to "Option 1"
+         //newEntry.Option2 = "Option 2"; // Example: Set the second option to "Option 2"
 
         // Add the new entry to the list (to later persist to the database)
-        userSelections.Add(newEntry);
-
-        // Reset the new entry object for a new entry
-        newEntry = new ScheduleEntry();
+    // userSelections.Add(newEntry);
     }
+    @inject IConfiguration Configuration
 
-    // Method to save user selections to the database
-    private async Task SaveToDatabase()
+    private async Task AddEntryAsync()
     {
-        // Ensure userSelections has data to save
-        if (userSelections.Count > 0)
+        if (string.IsNullOrEmpty(NewEntryName))
         {
-            foreach (var entry in userSelections)
-            {
-                // Add the entry to the DbContext for saving
-                DbContext.ScheduleEntries.Add(entry);
-            }
-
-            // Save changes to the database
-            await DbContext.SaveChangesAsync();
+            // Optionally, show an error message or do nothing
+            return;
         }
+
+        using var connection = new SqlConnection(Configuration.GetConnectionString("DefaultConnection"));
+
+        var query = "INSERT INTO Test1 (Name) VALUES (@Name)";
+
+        await connection.ExecuteAsync(query, new { Name = NewEntryName });
+
+        // Clear the TextBox after adding the entry
+        NewEntryName = string.Empty;
     }
+    private string NewEntryName { get; set; } = string.Empty;
 
+
+    private async Task LoadNames()
+    {
+        using var connection = new SqlConnection(Configuration.GetConnectionString("DefaultConnection"));
+
+        var query = "SELECT Name FROM Test1";
+
+        NamesList = (await connection.QueryAsync<string>(query)).ToList();
+    }
+    private List<string> NamesList { get; set; } = new List<string>();
 }
-

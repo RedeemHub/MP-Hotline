@@ -1,7 +1,7 @@
 using BlazorApp1.Components;
-using BlazorApp1.Components.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,13 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddDbContext<ScheduleDBContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Server=tcp:myfreesqldbserverinari.database.windows.net,1433;Initial Catalog=myFreeDB;Persist Security Info=False;User ID=inari;Password={your_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
-});
 
 
-var app = builder.Build();
+
+    var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
